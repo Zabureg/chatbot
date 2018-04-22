@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-client.login("MzYxNTI5Njg0NDg5NTM1NDk4.Db5MDQ.xbapLbjz6WrsC2euifVdP_ecZ0E");
+client.login("TOCKEN");
 /*
 client.on('ready', () => {
     client.user.setPresence({ game: { name: "жду команду..." }});
