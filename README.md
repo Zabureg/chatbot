@@ -7,3 +7,7 @@ First, you will need to install nodeJS on linux, install discord.js and only the
 3. git clone https://github.com/cheesegaproj/chatbot.git
 4. cd chatbot
 5. pm2 start index.js
+# Connecting to your bot
+To connect to your bot, you must create your application on the disc player's site and create a PUBLIC bot record for it. Then copy your token and insert it into index.js in the first lines instead of TOCKEN!
+# Info
+For information about the commands, see the Wiki
