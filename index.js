@@ -4,8 +4,9 @@ const ms = require('ms');
 const client = new Discord.Client();
 const permissions = require('./permissions.js');
 var mutedlist = JSON.parse(fs.readFileSync('muted.json'));
+var badwordslist = JSON.parse(fs.readFileSync('words.json'));
 
-client.login("TOCKEN");//пишите токен бота сюда
+client.login("MzYxNTI5Njg0NDg5NTM1NDk4.Db5pCQ.rjivXmDgUakV8GZSfIhO7tXznMs");
 
 /*
 client.on('ready', () => {
@@ -16,13 +17,20 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
+client.on('guildMemberAdd', member => {
+    //member.addRole('427571570991431710');
+    if(mutedlist[member.id]) {
+        let muterole = client.guilds.get("348866080019709952").roles.find('name', 'Mute (Нарушители)');
+        member.addRole(muterole.id);
+    }
+});
+
 var prefix = "!";
 client.on('message', message => {
     if(message.author === client.user) return;
-    if (!message.content.startsWith(prefix)) return;
+    if (!message.content.startsWith(prefix)) return checkForMatWords(message);
     const args = message.content.slice(prefix.length).split(/ +/);
     const commandName = args.shift().toLowerCase();
-    //команда инфо и FAQ
     if(commandName == "инфо") {
         if (!args.length) {
         message.reply(`Привет! Вот мой FAQ, напиши напиши номер одного из этих вопросов и дам ответ (например !инфо 1):\n
@@ -51,7 +59,7 @@ client.on('message', message => {
             return;
         }
         if(args[0] == "4"){
-            message.reply("если вас забанят именно за софт DM, то будет возврат средств (в 100% размере от стоимости чита). Но не всё так однозначно, администрация проверит ваш аккаунт лично и после, если вы не соврали, то будет возврат средств.");
+            message.reply("так как это чит - шанс бана присутствует всегда, поэтому вы играете на свой страх и риск");
             return;
         }
         if(args[0] == "5"){
@@ -67,17 +75,20 @@ client.on('message', message => {
             return;
         }
         if(args[0] == "8"){
-            message.reply(`Официальне страницы продавцов:\n
+            message.reply(`официальне страницы продавцов:\n
             Николай (Jason) - https://vk.com/jason227\n
             Артём - https://vk.com/desireseller`);
             return;
         }
         if(args[0] == "9"){
-            message.reply("Он не запускается из-за бага. Он работает на версии из SocialClub, но не запускается из стима. \n Сейчас этот баг исправляют!");
+            message.reply("если представленый ниже метод решение проблемы бага со стимом не работает. Значит вам надо ждать фикса. Т.к этот метод не у всех работает.\n 1. Запускаем сингл плеер. \n 2. Инжектим чит,но не включаем. \n 3. Запустить онлайн. \n 4. Ждём около 15 минут. \n 5. Запускаем чит. \n 6. Играем. \n P.s Тесты и создание фикса уже ИДУТ. И помните для этого нужно время.");
             return;
         }
     }
-    //exit
+    if(commandName == "coder") {
+        message.channel.send('Мой бомженька <@274572245651816450> и <@247102468331274240> лучше всех гыыы!!! ЛЮБЛЮ ЕГО!!! :****');
+        return;
+    }
     if(commandName == "exit") {
        if(message.author.id == '247102468331274240'){
         client.destroy().then(process.exit);
@@ -86,52 +97,132 @@ client.on('message', message => {
        return;
        }
     }
-    //команда mute
+     if(commandName == "clear") {
+        if(permissions['clear'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
+        if(!args) return message.reply("Error");
+        purge(message, args);
+        return;
+    }
     if(commandName == "mute"){
         if(permissions['mute'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
         Mute(message, args);
         return;
     }
-    //команда unmute
+
+    if(commandName == "addmat") {
+        if(permissions['addmat'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
+        var replace = /\[(.*?)\]/ism;
+        var matches = replace.exec(message.content); 
+        if(!matches) return message.reply("Error! Используйте !addmat [Слово|Сочетание слов]");
+        if(matches[1]) badwordslist.push(matches[1]+"$"); return message.channel.send(`Добавлено новое слово в черный список --> ${matches[1]}`);
+        return;
+    }
+
     if(commandName == "unmute"){
         if(permissions['unmute'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
         let member = message.mentions.members.first();
-        let role = client.guilds.get("348866080019709952").roles.find(`name`, "Mute (Нарушители)").id;
-        member.removeRole(role);
+        let tounmute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+        if(!tounmute) return message.reply("Пожалуйста используйте !unmute @user");
+        member.removeRole("382780524382650379");
         message.reply("пользователь убран из мута!");
         delete mutedlist[member.id];
         return;
     }
     message.reply("Такой команды не существует!");
 });
-//Функции команд mute и unmute
-function Mute(message, args) {
+
+function Mute(message, args, auto) {
     //!mute @челик 1s/m/h/d
-    let tomute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+    let tomute;
+    if(!auto) tomute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+    if(auto) tomute = message.guild.members.get(args[0]);
     if(!tomute) return message.reply("Пожалуйста используйте !mute @user 1s/m/h/d");
     let muterole = message.guild.roles.find(`name`, "Mute (Нарушители)");
     let mutetime = args[1];
     if(!mutetime) return message.reply("Вы не указали время!");
-
+    let reason = args[2];
+    if(ms(mutetime) == 0) mutetime = "∞"; 
+    if(!reason) {
+        reason = "Unspecified.";
+    } else {
+        if(!auto) {
+            var replace = /\[(.*?)\]/ism;
+            var matches = replace.exec(message.content); 
+            if(matches[1] != undefined) { reason = matches[1]; } else { reason = "Unspecified."; }
+        } else {reason = args[2]}
+    }
+    if(!auto) { mod = message.author.id; } else { mod = client.user.id; }
     tomute.addRole(muterole.id).then(function() {
-        if(mutetime == 0) { 
-            message.reply(`<@${tomute.id}> выдан мут на ∞`);
-        } else {
-            message.reply(`<@${tomute.id}> выдан мут на ${ms(ms(mutetime))}`);
-        }
+        let user = client.guilds.get('348866080019709952').members.get(tomute.id).user;
+        message.channel.send({
+            embed: {
+                color: 13632027,
+                author: {
+                    name: `[MUTED] ${user.username}#${user.discriminator}`,
+                    icon_url: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                },
+                fields: [
+                    {
+                        "name": "User",
+                        "value": `<@${tomute.id}>`,
+                        "inline": true
+                    },
+                    {
+                        "name": "Moderator",
+                        "value": `<@${mod}>`,
+                        "inline": true
+                    },
+                    {
+                        "name": "Reason",
+                        "value": `${reason}`,
+                        "inline": true
+                    },
+                    {
+                        "name": "Duration",
+                        "value": `${mutetime}`
+                    }
+                ]
+            }
+        });
         if(ms(mutetime) != 0) mutedlist[tomute.id] = ms(mutetime);
         return;
     });
 }
 
+async function purge(message, args) {
+    message.delete();
+    if(!args[0]) args[0] = 1;
+    const fetched = await message.channel.fetchMessages({limit: args[0]});
+    var messages = [];
+    fetched.forEach(function(element, index, array) {
+        if(element.author.id == client.user.id || element.content.startsWith(prefix)) messages.push(element);
+    });
+    messages.forEach(function(element, index, array) {
+        message.channel.fetchMessage(element.id)
+            .then(message => message.delete())
+            .catch(console.error);
+    });
+}
+
+function checkForMatWords(message) {
+    for (var key in badwordslist) {
+        if(message.content.search(badwordslist[key]) != -1) {
+            data = [message.author.id,'6h', 'Нецензурные выражения'];
+            Mute(message, data, true);
+            message.delete(5000);
+            return;
+        }
+    }
+}
+
 function UnMute(channel, id) {
-    let role = client.guilds.get(channel).roles.find(`name`, "Mute (Нарушители)").id;
+    let role = client.guilds.get(channel).roles.find(`name`, "Mute (Нарушители)").id; //название роли
     try {
         client.guilds.get(channel).members.get(id).removeRole(role);
     } catch(err) {
         return false;
     }
-    client.guilds.get(channel).channels.find('name', 'general').send('Пользователь убран из мута(<@'+id+'>)!');
+    client.guilds.get(channel).channels.find('name', 'general').send('Пользователь убран из мута(<@'+id+'>)!');//название чат-канала куда будут писаться оповещения
     return true;
 }
 
@@ -139,7 +230,7 @@ function minusMutedList() {
     for (var key in mutedlist) {
         if(mutedlist[key] <= 1) { 
             mutedlist[key] = mutedlist[key] - 1;
-            if(UnMute('348866080019709952', key)) delete mutedlist[key];
+            if(UnMute('348866080019709952', key)) delete mutedlist[key];//ID сервера
         } else {
             mutedlist[key] = mutedlist[key] - 1;
         }
@@ -151,3 +242,8 @@ function saveMutedList() {
     fs.writeFile('muted.json', JSON.stringify(mutedlist), function() {/*console.log(whitelist);*/});
 }
 setInterval(saveMutedList, 1000);
+
+function saveBadWordsList() {
+	fs.writeFile('words.json', JSON.stringify(badwordslist), function() {/*console.log(badwordslist);*/});
+}
+setInterval(saveBadWordsList, 1000);
