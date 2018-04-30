@@ -6,7 +6,7 @@ const permissions = require('./permissions.js');
 var mutedlist = JSON.parse(fs.readFileSync('muted.json'));
 var badwordslist = JSON.parse(fs.readFileSync('words.json'));
 
-client.login("TOCKEN");
+client.login("MzYxNTI5Njg0NDg5NTM1NDk4.Db5pCQ.rjivXmDgUakV8GZSfIhO7tXznMs");
 
 /*
 client.on('ready', () => {
@@ -33,17 +33,7 @@ client.on('message', message => {
     const commandName = args.shift().toLowerCase();
     if(commandName == "инфо") {
         if (!args.length) {
-        message.reply(`Привет! Вот мой FAQ, напиши напиши номер одного из этих вопросов и дам ответ (например !инфо 1):\n
-        Вопрос 1. Какая актуальная версия чита?\n
-        Вопрос 2. Сколько стоит чит?\n
-        Вопрос 3. Сколько стоит переход на другие версии?\n
-        Вопрос 4. Меня забанили за DM, что делать?\n
-        Вопрос 5. Сколько стоит переход на новую версию чита?\n
-        Вопрос 6. Кто админ чита?\n
-        Вопрос 7. Как мне узнать ссылку на группу в вк?\n
-        Вопрос 8. Как мне узнать официальные страницы продавцов чита?\n
-        Вопрос 9. Почему не запускается меню в GTA V из стима?\n
-        `);
+        message.reply("привет! Вот мой __*FAQ*__, напиши напиши номер одного из этих вопросов и дам ответ (например `!инфо 1`):\n**Вопрос 1.** Какая актуальная версия чита?\n**Вопрос 2.** Сколько стоит чит?\n**Вопрос 3.** Сколько стоит переход на другие версии?\n**Вопрос 4.** Меня забанили за DM, что делать?\n**Вопрос 5.** Сколько стоит переход на новую версию чита?\n**Вопрос 6.** Кто админ чита?\n**Вопрос 7.** Как мне узнать ссылку на группу в вк?\n**Вопрос 8.** Как мне узнать официальные страницы продавцов чита?\n**Вопрос 9.** Почему не запускается меню в GTA V из стима?\n");
         return;
         }
         if(args[0] == "1"){
@@ -75,9 +65,7 @@ client.on('message', message => {
             return;
         }
         if(args[0] == "8"){
-            message.reply(`официальне страницы продавцов:\n
-            Николай (Jason) - https://vk.com/jason227\n
-            Артём - https://vk.com/desireseller`);
+            message.reply("официальне страницы продавцов:\nНиколай (Jason) - https://vk.com/jason227\nАртём - https://vk.com/desireseller");
             return;
         }
         if(args[0] == "9"){
@@ -114,7 +102,7 @@ client.on('message', message => {
         var replace = /\[(.*?)\]/ism;
         var matches = replace.exec(message.content); 
         if(!matches) return message.reply("Error! Используйте !addmat [Слово|Сочетание слов]");
-        if(matches[1]) badwordslist.push(matches[1]+"$"); return message.channel.send(`Добавлено новое слово в черный список --> ${matches[1]}`);
+        if(matches[1]) badwordslist.push("^"+matches[1]+"$"); return message.channel.send(`Добавлено новое слово в черный список --> ${matches[1]}`);
         return;
     }
 
@@ -205,12 +193,17 @@ async function purge(message, args) {
 }
 
 function checkForMatWords(message) {
+    content = message.content.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    arr = content.split(" ");
     for (var key in badwordslist) {
-        if(message.content.search(badwordslist[key]) != -1) {
-            data = [message.author.id,'6h', 'Нецензурные выражения'];
-            Mute(message, data, true);
-            message.delete(5000);
-            return;
+        pattern = new RegExp(badwordslist[key], "gi");
+        for (var key in arr) {
+            if(arr[key].search(pattern) != -1) {
+                data = [message.author.id,'6h', 'Нецензурные выражения'];
+                Mute(message, data, true);
+                message.delete(5000);
+                return;
+            }
         }
     }
 }
