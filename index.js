@@ -6,12 +6,12 @@ const permissions = require('./permissions.js');
 var mutedlist = JSON.parse(fs.readFileSync('muted.json'));
 var badwordslist = JSON.parse(fs.readFileSync('words.json'));
 
-client.login("TOCKEN");
+client.login("MzYxNTI5Njg0NDg5NTM1NDk4.Db5pCQ.rjivXmDgUakV8GZSfIhO7tXznMs");
 
-/*
+
 client.on('ready', () => {
-    client.user.setPresence({ game: { name: "жду команду..." }});
-});*/
+    client.user.setPresence({ game: { name: "say !инфо" }});
+});
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -33,48 +33,48 @@ client.on('message', message => {
     const commandName = args.shift().toLowerCase();
     if(commandName == "инфо") {
         if (!args.length) {
-        message.reply("привет! Вот мой __*FAQ*__, напиши напиши номер одного из этих вопросов и дам ответ (например `!инфо 1`):\n**Вопрос 1.** Какая актуальная версия чита?\n**Вопрос 2.** Сколько стоит чит?\n**Вопрос 3.** Сколько стоит переход на другие версии?\n**Вопрос 4.** Меня забанили за DM, что делать?\n**Вопрос 5.** Сколько стоит переход на новую версию чита?\n**Вопрос 6.** Кто админ чита?\n**Вопрос 7.** Как мне узнать ссылку на группу в вк?\n**Вопрос 8.** Как мне узнать официальные страницы продавцов чита?\n**Вопрос 9.** Почему не запускается меню в GTA V из стима?\n");
+        message.reply("список моих команд(чтобы узнать информацию о команде, пиши, например, `!инфо 1`): \n**1. `!connect`** \n**2. `!clear`**\n**3. `!mute`**\n**4. `!addmat`**\n**5. `!unmute`**\n**6. `!muted`**\n**7. `!github`**\n**8. `!kick`**\n**9. `!ban`**");
         return;
         }
         if(args[0] == "1"){
-            message.reply("актуальная версия чита: 3.1");
+            message.reply("выдает информацию, при помощи которой вы сможете подключить бота к себе на сервер.");
             return;
         }
         if(args[0] == "2"){
-            message.reply("чит имеет несколько версий. Премиум версия стоит 490 рублей, VIP версия стоит 890 рублей, вип версия навсегда стоит 1490 рублей.");
+            message.reply("удаляет сообщения бота и написанные ему команды. Пример: !clear 10");
             return;
         }
         if(args[0] == "3"){
-            message.reply("переход с премиум версии на VIP стоит 350 рублей, переход с VIP на VIP навсегда 700 рублей, переход с премиум на VIP навсегда стоит 1000 рублей.");
+            message.reply("добавляет пользователя в мут. Пример: !mute @user 1h [причина мута].");
             return;
         }
         if(args[0] == "4"){
-            message.reply("так как это чит - шанс бана присутствует всегда, поэтому вы играете на свой страх и риск");
+            message.reply("добавляет определенное слово в черный список, за которое пользователь будет попадать в мут. Пример: !addmat [пипка].");
             return;
         }
         if(args[0] == "5"){
-            message.reply("переход на следующий патч (к примеру с версии чита 2.5 на 3.1) стоит 200 рублей.");
+            message.reply("убирает человека из мута. Пример: !unmute @user");
             return;
         }
         if(args[0] == "6"){
-            message.reply("администратор чита - Jason");
+            message.reply("показывает пользователей, которые находятся в муте и сколько им осталось сидеть.");
             return;
         }
         if(args[0] == "7"){
-            message.reply("группа чита - https://vk.com/desiremenu");
+            message.reply("ссылка на исходный код бота.");
             return;
         }
         if(args[0] == "8"){
-            message.reply("официальне страницы продавцов:\nНиколай (Jason) - https://vk.com/jason227\nАртём - https://vk.com/desireseller");
+            message.reply("!kick @user - выгоняет пользователя с сервера.");
             return;
         }
         if(args[0] == "9"){
-            message.reply("если представленый ниже метод решение проблемы бага со стимом не работает. Значит вам надо ждать фикса. Т.к этот метод не у всех работает.\n 1. Запускаем сингл плеер. \n 2. Инжектим чит,но не включаем. \n 3. Запустить онлайн. \n 4. Ждём около 15 минут. \n 5. Запускаем чит. \n 6. Играем. \n P.s Тесты и создание фикса уже ИДУТ. И помните для этого нужно время.");
+            message.reply("!ban @user - банит пользователя на сервере.");
             return;
         }
     }
-    if(commandName == "coder") {
-        message.channel.send('Мой бомженька <@274572245651816450> и <@247102468331274240> лучше всех гыыы!!! ЛЮБЛЮ ЕГО!!! :****');
+    if(commandName == "connect") {
+        message.channel.send('чтобы подключить бота к себе на сервер, напишите на почту CblPGamer@yandex.ru или в Discord <@247102468331274240>');
         return;
     }
     if(commandName == "exit") {
@@ -116,7 +116,70 @@ client.on('message', message => {
         delete mutedlist[member.id];
         return;
     }
-    message.reply("Такой команды не существует!");
+    if(commandName == "unmute"){
+        if(permissions['unmute'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
+        let member = message.mentions.members.first();
+        let tounmute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+        if(!tounmute) return message.reply("Пожалуйста используйте !unmute @user");
+        member.removeRole("382780524382650379");
+        message.reply("пользователь убран из мута!");
+        delete mutedlist[member.id];
+        return;
+    }
+    
+    if(commandName == "muted") {
+        var text = '';
+        for (var key in mutedlist) {
+            text += `Пользователь <@${key}> сидит ещё ${ms(mutedlist[key])} \n`;
+        }
+        if(text == ""){
+        	message.reply("на данный момент, пользователей в муте нет");
+        }else{
+        message.channel.send(text);
+    }
+        return;
+    }
+    if(commandName == "github"){
+    	message.reply("https://github.com/cheesegaproj/chatbot");
+    	return;
+    }
+	
+	if(commandName == "kick"){
+		if(permissions['ban'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
+        let member = message.mentions.members.first();
+        let tounmute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+        if(!tounmute) return message.reply("пожалуйста используйте !kick @user");
+        member.kick()
+        .then(() => console.log(`Kicked ${member.displayName}`));
+        message.reply(`${member} выпнули из нашего бара!`);
+	}
+
+	if(commandName == "ban"){
+		if(permissions['ban'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
+        let member = message.mentions.members.first();
+        let tounmute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+        if(!tounmute) return message.reply("пожалуйста используйте !ban @user");
+        member.ban()
+        .then(() => console.log(`Banned ${member.displayName}`));
+        message.channel.send(`Прощайте, бездорь ${member}. Его ID для разбана: ${member.id}`);
+	}
+
+	if (commandName == "unban") {
+		/*
+		if(permissions['unmute'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
+        let member = message.mentions.members.first();
+        let tounmute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+        if(!tounmute) return message.reply("пожалуйста используйте !unban @user");
+        member.id.unban();
+        */
+        if(permissions['ban'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
+	    const user = args[0];
+	    if(!args[0]) return message.reply("используйте !unban member.id");
+	    message.guild.unban(user);
+	    message.reply(`Успешно разбанен <@${user}>`)
+	    console.log(`Unbanned ${user}`);
+	}
+
 });
 
 function Mute(message, args, auto) {
