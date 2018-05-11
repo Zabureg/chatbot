@@ -5,8 +5,30 @@ const client = new Discord.Client();
 const permissions = require('./permissions.js');
 var mutedlist = JSON.parse(fs.readFileSync('muted.json'));
 var badwordslist = JSON.parse(fs.readFileSync('words.json'));
+/* RAINBOW START */
+var interval;
+let place = 0;
+const size    = 50;
+const rainbow = new Array(size);
 
-client.login("TOCKEN");
+for (var i=0; i<size; i++) {
+  var red   = sin_to_hex(i, 0 * Math.PI * 2/3); // 0   deg
+  var blue  = sin_to_hex(i, 1 * Math.PI * 2/3); // 120 deg
+  var green = sin_to_hex(i, 2 * Math.PI * 2/3); // 240 deg
+
+  rainbow[i] = '#'+ red + green + blue;
+}
+
+function sin_to_hex(i, phase) {
+  var sin = Math.sin(Math.PI / size * 2 * i + phase);
+  var int = Math.floor(sin * 127) + 128;
+  var hex = int.toString(16);
+
+  return hex.length === 1 ? '0'+hex : hex;
+}
+/* RAINBOW END */
+
+client.login("TOCEN");
 
 
 client.on('ready', () => {
@@ -33,7 +55,7 @@ client.on('message', message => {
     const commandName = args.shift().toLowerCase();
     if(commandName == "инфо") {
         if (!args.length) {
-        message.reply("список моих команд(чтобы узнать информацию о команде, пиши, например, `!инфо 1`): \n**1. `!connect`** \n**2. `!clear`**\n**3. `!mute`**\n**4. `!addmat`**\n**5. `!unmute`**\n**6. `!muted`**\n**7. `!github`**\n**8. `!kick`**\n**9. `!ban`**");
+        message.reply("список моих команд(чтобы узнать информацию о команде, пиши, например, `!инфо 1`): \n**1. `!connect`** \n**2. `!clear`**\n**3. `!mute`**\n**4. `!addmat`**\n**5. `!unmute`**\n**6. `!muted`**\n**7. `!github`**\n**8. `!kick`**\n**9. `!ban`**\n**10. `!unban`**\n**~~11.~~ `!rainbow`**");
         return;
         }
         if(args[0] == "1"){
@@ -72,18 +94,23 @@ client.on('message', message => {
             message.reply("!ban @user - банит пользователя на сервере.");
             return;
         }
+        if(args[0] == "10"){
+            message.reply("!unban @user - разбанит пользователя на сервере.");
+            return;
+        }
+        if(args[0] == "11"){
+            message.reply("!rainbow start/stop - радужная роль. Команда !rainbow stop срабатывает не сразу, через какое-то время! **Команда выключена администратором бота**.");
+            return;
+        }
     }
     if(commandName == "connect") {
         message.channel.send('чтобы подключить бота к себе на сервер, напишите на почту CblPGamer@yandex.ru или в Discord <@247102468331274240>');
         return;
     }
     if(commandName == "exit") {
-       if(message.author.id == '247102468331274240'){
-        client.destroy().then(process.exit);
-       }else{
-        message.reply("у вас нет прав для выполнения этой команды, её может писать только <@247102468331274240>");
-       return;
-       }
+	    if(permissions['mute'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");	
+	    client.destroy().then(process.exit);
+	    return;
     }
      if(commandName == "clear") {
         if(permissions['clear'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
@@ -165,13 +192,6 @@ client.on('message', message => {
 	}
 
 	if (commandName == "unban") {
-		/*
-		if(permissions['unmute'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
-        let member = message.mentions.members.first();
-        let tounmute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
-        if(!tounmute) return message.reply("пожалуйста используйте !unban @user");
-        member.id.unban();
-        */
         if(permissions['ban'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
 	    const user = args[0];
 	    if(!args[0]) return message.reply("используйте !unban member.id");
@@ -179,8 +199,45 @@ client.on('message', message => {
 	    message.reply(`Успешно разбанен <@${user}>`)
 	    console.log(`Unbanned ${user}`);
 	}
-
+    if(commandName == "rainbow"){
+    	if(permissions['ban'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
+        if(args[0] == "start") {
+            if(interval == undefined) interval = setInterval(() => { discoRole(message); }, 150);
+        } else if(args[0] == "stop") {
+            clearInterval(interval); 
+            interval = undefined;
+        } else {
+            message.reply('gg');
+        }
+        return;
+    }
+    message.reply("такой команды не существует! Напишите !инфо чтобы посмотреть список команд.");
+    
+    function discoRole(message) {
+        let theRole = message.guild.roles.find("name", "Rainbow");
+        let theRole1 = message.guild.roles.find("name", "Администратор");
+        let theRole2 = message.guild.roles.find("name", "Mute (Нарушители)");
+        let theRole3 = message.guild.roles.find("name", "Модераторы");
+        theRole.edit({color: rainbow[place]}).catch(e => {
+            console.error(e);
+        });
+        theRole1.edit({color: rainbow[place]}).catch(e => {
+            console.error(e);
+        });
+        theRole2.edit({color: rainbow[place]}).catch(e => {
+            console.error(e);
+        });
+        theRole3.edit({color: rainbow[place]}).catch(e => {
+            console.error(e);
+        });
+        if(place == (size - 1)) {
+            place = 0;
+        } else {
+            place++;
+        }
+    }
 });
+    
 
 function Mute(message, args, auto) {
     //!mute @челик 1s/m/h/d
@@ -292,6 +349,17 @@ function minusMutedList() {
         }
     }
 }
+
+function discoRole() {
+    let random = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+    roles.forEach((role) => {
+      let theRole = message.guild.roles.find("name", "Mute (Нарушители)");
+      theRole.edit({color: random}).catch(e => {
+        console.error(e);
+      });
+    });
+  }
+
 setInterval(minusMutedList, 1);
 
 function saveMutedList() {
