@@ -1,2 +1,2 @@
 # chatbot
-ChatBot
+Discord support server: https://discord.gg/jwnPHdA
