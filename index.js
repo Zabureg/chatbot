@@ -28,7 +28,7 @@ function sin_to_hex(i, phase) {
 }
 /* RAINBOW END */
 
-client.login("MzYxNTI5Njg0NDg5NTM1NDk4.DdhGZA.cLMNoe2iJwlNoUndHSmVWFI2Bms");
+client.login("TOCEN");
 
 
 client.on('ready', () => {
