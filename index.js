@@ -3,7 +3,7 @@ const fs = require('fs');
 const ms = require('ms');
 const client = new Discord.Client();
 const permissions = require('./permissions.js');
-const { prefix, token, serverid, rainbowroles, muterole, reportchannel} = require('./config.json');
+const { prefix, token, serverid, rainbowroles, muterol, reportchannel, generalchatid} = require('./config.json');
 var mutedlist = JSON.parse(fs.readFileSync('muted.json'));
 var badwordslist = JSON.parse(fs.readFileSync('words.json'));
 var IsAuth = false;
@@ -42,8 +42,8 @@ client.on('ready', () => {
 client.on('guildMemberAdd', member => {
     //member.addRole('427571570991431710');
     if(mutedlist[member.id]) {
-        let muterole = client.guilds.get("serverid").roles.find('name', muterole);
-        member.addRole(muterole.id);
+        let muterole = client.guilds.get(serverid).roles.find('name', muterol);
+        member.addRole(muterol.id);
     }
     var newUsers = '';
     const guild = member.guild;
@@ -367,7 +367,6 @@ function Mute(message, args, auto) {
 		message.channel.send(embed);
         return
     }
-    let muterole = message.guild.roles.find(`name`, muterole);
     let mutetime = args[1];
     if(!mutetime){
 		const embed = new Discord.RichEmbed()
@@ -389,9 +388,10 @@ function Mute(message, args, auto) {
             if(matches[1] != undefined) { reason = matches[1]; } else { reason = "Unspecified."; }
         } else {reason = args[2]}
     }
+    let role = client.guilds.get(serverid).roles.find('name', muterol).id;
     if(!auto) { mod = message.author.id; } else { mod = client.user.id; }
-    tomute.addRole(muterole.id).then(function() {
-        let user = client.guilds.get('serverid').members.get(tomute.id).user;
+    tomute.addRole(role).then(function() {
+        let user = client.guilds.get(serverid).members.get(tomute.id).user;
 		const embed = new Discord.RichEmbed()
 			.setColor(13632027)
 			.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
@@ -438,13 +438,13 @@ function checkForMatWords(message) {
 
 function UnMute(channel, id) {
 	if(!IsAuth) return false;
-    let role = client.guilds.get(channel).roles.find('name', muterole).id; //название роли
+    let role = client.guilds.get(channel).roles.find('name', muterol).id; //название роли
     try {
         client.guilds.get(channel).members.get(id).removeRole(role);
     } catch(err) {
         return false;
     }
-    client.guilds.get(channel).channels.find('id', serverid).send(`Пользователь убран из мута(<@${id}>)!`);//название чат-канала куда будут писаться оповещения
+    client.guilds.get(channel).channels.find('id', generalchatid).send(`Пользователь убран из мута(<@${id}>)!`);//название чат-канала куда будут писаться оповещения
     return true;
 }
 

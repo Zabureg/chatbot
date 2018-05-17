@@ -3,6 +3,7 @@
     "token": "",
     "serverid": "348866080019709952",
     "rainbowroles": ["Администратор", "Модераторы"],
-    "muterole": "Mute (Нарушители)",
-    "reportchannel": "desire-menu-music"
+    "muterol": "Mute (Нарушители)",
+    "reportchannel": "desire-menu-music",
+    "generalchatid": "348866080019709953"
 }
