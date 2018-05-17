@@ -3,12 +3,14 @@ const fs = require('fs');
 const ms = require('ms');
 const client = new Discord.Client();
 const permissions = require('./permissions.js');
+const { prefix, token, serverid, rainbowroles, muterole} = require('./config.json');
 var mutedlist = JSON.parse(fs.readFileSync('muted.json'));
 var badwordslist = JSON.parse(fs.readFileSync('words.json'));
+var IsAuth = false;
 /* RAINBOW START */
 var interval;
 let place = 0;
-const size    = 50;
+const size    = 100;
 const rainbow = new Array(size);
 
 for (var i=0; i<size; i++) {
@@ -28,21 +30,19 @@ function sin_to_hex(i, phase) {
 }
 /* RAINBOW END */
 
-client.login("TOCEN");
+client.login(token);
 
 
 client.on('ready', () => {
-    client.user.setPresence({ game: { name: "напиши !инфо" }});
-});
-
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+	console.log(`Logged in as ${client.user.tag}!`);
+    client.user.setActivity(`${prefix}инфо`, { type: 'LISTENING' }).catch(console.error);
+	IsAuth = true;
 });
 
 client.on('guildMemberAdd', member => {
     //member.addRole('427571570991431710');
     if(mutedlist[member.id]) {
-        let muterole = client.guilds.get("348866080019709952").roles.find('name', 'Mute (Нарушители)');
+        let muterole = client.guilds.get("serverid").roles.find('name', muterole);
         member.addRole(muterole.id);
     }
     var newUsers = '';
@@ -51,216 +51,110 @@ client.on('guildMemberAdd', member => {
     const defaultChannel = guild.channels.find(c=> c.permissionsFor(guild.me).has("SEND_MESSAGES"));
     defaultChannel.send(`${member}, приветствую тебя на сервере! Пиши **!инфо**, чтобы посмотреть список команд. \nОбязательно посети чат **#faq и #regulations**.`);});
 
-var prefix = "!";
 client.on('message', message => {
     if(message.author === client.user) return;
     if (!message.content.startsWith(prefix)) return checkForMatWords(message);
     const args = message.content.slice(prefix.length).split(/ +/);
     const commandName = args.shift().toLowerCase();
     if(commandName == "инфо") {
-        if (!args.length) {
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо]",
-                    "value": "список моих команд(чтобы узнать информацию о команде, пиши, например, `!инфо 1`):\n**1. `!clear`**\n**2. `!mute`**\n**3. `!addmat`**\n**4. `!unmute`**\n**5. `!muted`**\n**6. `!github`**\n**7. `!kick`**\n**8. `!ban`**\n**9. `!unban`**\n**10. `!rainbow`**\n**11. `!coin`**\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-            message.channel.send({ embed });
-        return;
-        }
-        if(args[0] == "1"){
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо 1]",
-                    "value": "!clear число - чистит чат от команд и сообщений бота\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-            message.channel.send({ embed });
-            return;
+		if(!args.length) {
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо]", "список моих команд(чтобы узнать информацию о команде, пиши, например, `!инфо 1`):\n**1. `!clear`**\n**2. `!mute`**\n**3. `!addmat`**\n**4. `!unmute`**\n**5. `!muted`**\n**6. `!github`**\n**7. `!kick`**\n**8. `!ban`**\n**9. `!unban`**\n**10. `!rainbow`**\n**11. `!coin`**\n**12. `!exit`**\n**13. `!report`**\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
+		} else if(args[0] == "1") {
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 1]", "!clear число - чистит чат от команд и сообщений бота\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
         }
         if(args[0] == "2"){
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо 2]",
-                    "value": "добавляет пользователя в мут. Пример: !mute @user 1h [причина мута].\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-              message.channel.send({ embed });
-            return;
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 2]", "добавляет пользователя в мут. Пример: !mute @user 1h [причина мута].\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
         }
         if(args[0] == "3"){
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо 3]",
-                    "value": "добавляет определенное слово в черный список, за которое пользователь будет попадать в мут. Пример: !addmat [пипка].\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-              message.channel.send({ embed });
-            return;
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 3]", "добавляет определенное слово в черный список, за которое пользователь будет попадать в мут. Пример: !addmat [пипка].\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
         }
         if(args[0] == "4"){
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо 4]",
-                    "value": "убирает человека из мута. Пример: !unmute @user\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-              message.channel.send({ embed });            
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 4]", "убирает человека из мута. Пример: !unmute @user\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+              message.channel.send(embed);            
               return;
         }
         if(args[0] == "5"){
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо 5]",
-                    "value": "показывает пользователей, которые находятся в муте и сколько им осталось сидеть.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-              message.channel.send({ embed });
-              return;
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 5]", "показывает пользователей, которые находятся в муте и сколько им осталось сидеть.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
         }
         if(args[0] == "6"){
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо 6]",
-                    "value": "ссылка на исходный код бота.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-              message.channel.send({ embed });
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 6]", "ссылка на исходный код бота.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+              message.channel.send(embed);
             return;
         }
         if(args[0] == "7"){
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо 7]",
-                    "value": "!kick @user - выгоняет пользователя с сервера.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-              message.channel.send({ embed });
-            return;
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 7]", "!kick @user - выгоняет пользователя с сервера.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
         }
         if(args[0] == "8"){
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо 8]",
-                    "value": "!ban @user - банит пользователя на сервере.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-              message.channel.send({ embed });
-            return;
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 8]", "!ban @user - банит пользователя на сервере.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
         }
         if(args[0] == "9"){
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо 9]",
-                    "value": "!unban ID - разбанит пользователя на сервере.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-              message.channel.send({ embed });
-            return;
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 9]", "!unban ID - разбанит пользователя на сервере.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
         }
         if(args[0] == "10"){//!rainbow start/stop - радужная роль. Команда !rainbow stop срабатывает не сразу, через какое-то время!
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо 10]",
-                    "value": "!rainbow start/stop - радужная роль. Команда !rainbow stop срабатывает не сразу, через какое-то время!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-              message.channel.send({ embed });
-            return;
+		const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 10]", "!rainbow start/stop - радужная роль. Команда !rainbow stop срабатывает не сразу, через какое-то время!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
         }
         if(args[0] == "11"){
-            const embed = {
-                "color": 16777215,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!инфо 11]",
-                    "value": "!coin - Монетка. Либо вы победите, либо проиграете.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)"
-                  }
-                ]
-              };
-              message.channel.send({ embed });
-            return;
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 11]", "!coin - Монетка. Либо вы победите, либо проиграете.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
+        }
+        if(args[0] == "12"){
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 12]", "!exit - выключает/перезагружает бота.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
+        }
+        if(args[0] == "13"){
+			const embed = new Discord.RichEmbed()
+				.setColor(16777215)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!инфо 13]", "!report @user [Текст] - отправлет жалобу на пользователя администратору.\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)")
+            return message.channel.send(embed);
         }
     }
     if(commandName == "exit") {
@@ -293,38 +187,20 @@ client.on('message', message => {
         let member = message.mentions.members.first();
         let tounmute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
         if(!tounmute){
-            const embed = {
-                "color": 16734464,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!unmute]",
-                    "value": `Используйте !mute @user!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`
-                  }
-                ]
-              };
-            message.channel.send({ embed });
+			const embed = new Discord.RichEmbed()
+				.setColor(16734464)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!unmute]", `Используйте !mute @user!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+			message.channel.send(embed);
         }else{
-        const embed = {
-            "color": 16734464,
-            "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                "text": "Coder - cheesega."
-            },
-            "fields": [
-              {
-                "name": "[!unmute]",
-                "value": `${member} вышел из мута!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`
-              }
-            ]
-          };
-        message.channel.send({ embed });
-        let role = client.guilds.get("348866080019709952").roles.find(`name`, 'Mute (Нарушители)').id;
-        member.removeRole(role);
-        delete mutedlist[member.id];
+			const embed = new Discord.RichEmbed()
+				.setColor(16734464)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!unmute]", `${member} вышел из мута!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+			message.channel.send(embed);
+			let role = client.guilds.get(serverid).roles.find('name', muterole).id;
+			member.removeRole(role);
+			delete mutedlist[member.id];
         }
         return;
     }
@@ -336,39 +212,21 @@ client.on('message', message => {
         }
         if(text == ""){
         	message.reply("на данный момент, пользователей в муте нет");
-        }else{
-            const embed = {
-                "color": 5504768,
-                "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "fields": [
-                  {
-                    "name": "[!muted]",
-                    "value": `${text}\n[Сервер поддержки](https://discord.gg/jwnPHdA)`
-                  }
-                ]
-              };
-              message.channel.send({ embed });
-    }
+        } else {
+			const embed = new Discord.RichEmbed()
+				.setColor(5504768)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!muted]", `${text}\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+            message.channel.send(embed);
+		}
         return;
     }
     if(commandName == "github"){
-    	const embed = {
-            "color": 5504768,
-            "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                "text": "Coder - cheesega."
-            },
-            "fields": [
-              {
-                "name": "[!github]",
-                "value": `\nМой github - [жми](https://github.com/cheesegaproj/chatbot)\n[Сервер поддержки](https://discord.gg/jwnPHdA)`
-              }
-            ]
-          };
-          message.channel.send({ embed });
+		const embed = new Discord.RichEmbed()
+			.setColor(5504768)
+			.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+			.addField("[!github]", `\nМой github - [жми](https://github.com/cheesegaproj/chatbot)\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+        message.channel.send(embed);
     	return;
     }
 	
@@ -379,21 +237,12 @@ client.on('message', message => {
         if(!tounmute) return message.reply("пожалуйста используйте !kick @user");
         member.kick()
         .then(() => console.log(`Kicked ${member.displayName}`));
-        const embed = {
-            "color": 16734464,
-            "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                "text": "Coder - cheesega."
-            },
-            "fields": [
-              {
-                "name": "[!kick]",
-                "value": `${member} кикнут с сервера!\n[Сервер поддержки](https://discord.gg/jwnPHdA)`
-              }
-            ]
-          };
-          message.channel.send({ embed });
-          return;
+		const embed = new Discord.RichEmbed()
+			.setColor(16734464)
+			.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+			.addField("[!kick]", `${member} кикнут с сервера!\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+        message.channel.send(embed);
+        return;
 	}
 
 	if(commandName == "ban"){
@@ -403,22 +252,12 @@ client.on('message', message => {
         if(!tounmute) return message.reply("пожалуйста используйте !ban @user");
         member.ban()
         .then(() => console.log(`Banned ${member.displayName}`));
-        const embed = {
-            "color": 16711680,
-            "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                "text": "Coder - cheesega."
-            },
-            "fields": [
-                {
-                  "name": "[!kick]",
-                  "value": `${member} забанен на сервере!\nЕго ID: ${member.id}\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`
-                }
-            ]
-
-          };
-          message.channel.send({ embed });
-          return;
+		const embed = new Discord.RichEmbed()
+			.setColor(16711680)
+			.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+			.addField("[!kick]", `${member} забанен на сервере!\nЕго ID: ${member.id}\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+        message.channel.send(embed);
+        return;
 	}
 
 	if (commandName == "unban") {
@@ -427,61 +266,30 @@ client.on('message', message => {
 	    if(!args[0]) return message.reply("используйте !unban member.id");
 	    message.guild.unban(user);
         console.log(`Unbanned ${user}`);
-        const embed = {
-            "color": 16711680,
-            "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                "text": "Coder - cheesega."
-            },
-            "fields": [
-                {
-                  "name": "[!unban]",
-                  "value": `${user} разбанен на сервере!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`
-                },
-            ]
-
-          };
-          message.channel.send({ embed });
-          return;
-        
+		const embed = new Discord.RichEmbed()
+			.setColor(16711680)
+			.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+			.addField("[!unban]", `${user} разбанен на сервере!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+        message.channel.send(embed);
+        return;  
 	}
     if(commandName == "rainbow"){
     	if(permissions['ban'].indexOf(message.author.id) == -1) return message.reply("у вас нет прав для выполнения этой команды!");
         if(args[0] == "start") {
             if(interval == undefined) interval = setInterval(() => { discoRole(message); }, 150);
-            const embed = {
-                "color": 16711867,
-                "footer": {
-                    "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                    "text": "Coder - cheesega."
-                },
-                "fields": [
-                    {
-                      "name": "[!rainbow start]",
-                      "value": `Радуга началась!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`
-                    },
-                ]
-    
-              };
-            message.channel.send({ embed });
+			const embed = new Discord.RichEmbed()
+				.setColor(16711867)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!rainbow start]", `Радуга началась!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+			message.channel.send(embed);
         } else if(args[0] == "stop") {
             clearInterval(interval); 
             interval = undefined;
-            const embed = {
-                "color": 24575,
-                "footer": {
-                    "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                    "text": "Coder - cheesega."
-                },
-                "fields": [
-                    {
-                      "name": "[!rainbow stop]",
-                      "value": `Радуга останавливается!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`
-                    },
-                ]
-    
-              };
-            message.channel.send({ embed });
+			const embed = new Discord.RichEmbed()
+				.setColor(24575)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.addField("[!rainbow stop]", `Радуга останавливается!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+			message.channel.send(embed);
         } else {
             message.reply('gg');
         }
@@ -490,56 +298,57 @@ client.on('message', message => {
     if(commandName == "coin"){
         var rand = Math.floor(Math.random() * (2 - 1 + 1)) + 0;//https://images-ext-1.discordapp.net/external/psw8bjb7MLk5ifrtsyYLtYf_UORozzkQrctGwklKc7U/https/i.imgur.com/ZyCwWuE.png?width=100&height=100
         if(rand == "0"){
-            const embed = {
-                "color": 14286592,
-                "footer": {
-                  "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "thumbnail": {
-                  "url": "https://images-ext-1.discordapp.net/external/psw8bjb7MLk5ifrtsyYLtYf_UORozzkQrctGwklKc7U/https/i.imgur.com/ZyCwWuE.png"
-                },
-                "fields": [
-                  {
-                    "name": "Coin",
-                    "value": "\nВы проиграли"
-                  }
-                ]
-              };
-              message.channel.send({ embed });
+			const embed = new Discord.RichEmbed()
+				.setColor(14286592)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.setThumbnail("https://images-ext-1.discordapp.net/external/psw8bjb7MLk5ifrtsyYLtYf_UORozzkQrctGwklKc7U/https/i.imgur.com/ZyCwWuE.png")
+				.addField("Coin", "\nВы проиграли")
+			message.channel.send(embed);
         }else{
-            const embed = {
-                "color": 14286592,
-                "footer": {
-                  "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                  "text": "Coder - cheesega."
-                },
-                "thumbnail": {
-                  "url": "https://images-ext-1.discordapp.net/external/0Aqs6FQriCBitmkZqMNBhedGhVM-J8wDVPnHQhFhdgQ/https/i.imgur.com/9FsWNZk.png"
-                },
-                "fields": [
-                  {
-                    "name": "Coin",
-                    "value": "\nВы выиграли"
-                  }
-                ]
-              };
-              message.channel.send({ embed });
+			const embed = new Discord.RichEmbed()
+				.setColor(14286592)
+				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+				.setThumbnail("https://images-ext-1.discordapp.net/external/0Aqs6FQriCBitmkZqMNBhedGhVM-J8wDVPnHQhFhdgQ/https/i.imgur.com/9FsWNZk.png")
+				.addField("Coin", "\nВы выиграли")
+			message.channel.send(embed);
         }
         return
     }
+
+	if(commandName == "report"){
+        let user = message.guild.member(message.mentions.users.first());
+        if(!user) return message.reply("вы не упомянули пользователя!");
+        var replace = /\[(.*?)\]/ism;
+        var reportuser = replace.exec(message.content);
+        if(!reportuser) return message.reply("вы не написали текст жалобы!");
+        const embed = new Discord.RichEmbed()
+			.setColor(13632027)
+			.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+            .addField("Нарушитель", `<@${user.id}>`)
+            .addField("Канал", `${message.channel}`)
+            .addField("Отправитель", `<@${message.author.id}>`)
+            .addField("Текст репорта", `**${reportuser[1]}**\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+            message.guild.channels.find('name', 'desire-menu-music').send(embed);
+            message.reply("ваша жалоба на пользователя отправлена! Ваше сообщение с командой !report было удалено.");
+            message.delete(message.author.id);
+        return;
+    }
+
     message.reply("такой команды не существует! Напишите !инфо чтобы посмотреть список команд.");
     
     function discoRole(message) {
-        let theRole = message.guild.roles.find("name", "Coder");
-        theRole.edit({color: rainbow[place]}).catch(e => {
-            console.error(e);
-        });
-        if(place == (size - 1)) {
-            place = 0;
-        } else {
-            place++;
-        }
+        rainbowroles.forEach(async function(element, index, array) {
+            let theRole = message.guild.roles.find("name", element);
+            if(!theRole) return;
+                theRole.edit({color: rainbow[place]}).catch(e => {
+                    console.error(e);
+                });
+            if(place == (size - 1)) {
+                place = 0;
+            } else {
+                place++;
+            }
+        })
     }
 });
     
@@ -550,39 +359,23 @@ function Mute(message, args, auto) {
     if(!auto) tomute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
     if(auto) tomute = message.guild.members.get(args[0]);
     if(!tomute){
-        const embed = {
-            "color": 16734464,
-            "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                "text": "Coder - cheesega."
-            },
-            "fields": [
-              {
-                "name": "[!mute]",
-                "value": `Используйте !mute @user 1s/m/h/d!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`
-              }
-            ]
-          };
-        message.channel.send({ embed });
+		const embed = new Discord.RichEmbed()
+			.setColor(16734464)
+			.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+			.setThumbnail("https://images-ext-1.discordapp.net/external/0Aqs6FQriCBitmkZqMNBhedGhVM-J8wDVPnHQhFhdgQ/https/i.imgur.com/9FsWNZk.png")
+			.addField("[!mute]", `Используйте !mute @user 1s/m/h/d!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+		message.channel.send(embed);
         return
     }
-    let muterole = message.guild.roles.find(`name`, 'Mute (Нарушители)');
+    let muterole = message.guild.roles.find(`name`, muterole);
     let mutetime = args[1];
     if(!mutetime){
-        const embed = {
-            "color": 16734464,
-            "footer": {
-                "icon_url": "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png",
-                "text": "Coder - cheesega."
-            },
-            "fields": [
-              {
-                "name": "[!mute]",
-                "value": `Вы не указали время!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`
-              }
-            ]
-          };
-        message.channel.send({ embed });
+		const embed = new Discord.RichEmbed()
+			.setColor(16734464)
+			.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+			.setThumbnail("https://images-ext-1.discordapp.net/external/0Aqs6FQriCBitmkZqMNBhedGhVM-J8wDVPnHQhFhdgQ/https/i.imgur.com/9FsWNZk.png")
+			.addField("[!mute]", `Вы не указали время!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
+		message.channel.send(embed);
         return
     }
     let reason = args[2];
@@ -598,37 +391,15 @@ function Mute(message, args, auto) {
     }
     if(!auto) { mod = message.author.id; } else { mod = client.user.id; }
     tomute.addRole(muterole.id).then(function() {
-        let user = client.guilds.get('348866080019709952').members.get(tomute.id).user;
-        message.channel.send({
-            embed: {
-                color: 13632027,
-                author: {
-                    name: `[MUTED] ${user.username}#${user.discriminator}`,
-                    icon_url: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-                },
-                fields: [
-                    {
-                        "name": "User",
-                        "value": `<@${tomute.id}>`,
-                        "inline": true
-                    },
-                    {
-                        "name": "Moderator",
-                        "value": `<@${mod}>`,
-                        "inline": true
-                    },
-                    {
-                        "name": "Reason",
-                        "value": `${reason}`,
-                        "inline": true
-                    },
-                    {
-                        "name": "Duration",
-                        "value": `${mutetime}`
-                    }
-                ]
-            }
-        });
+        let user = client.guilds.get('serverid').members.get(tomute.id).user;
+		const embed = new Discord.RichEmbed()
+			.setColor(13632027)
+			.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+			.addField("User", `<@${tomute.id}>`, true)
+			.addField("Moderator", `<@${mod}>`, true)
+			.addField("Reason", `${reason}`, true)
+			.addField("Duration", `${mutetime}`, true)
+		message.channel.send(embed);
         if(ms(mutetime) != 0) mutedlist[tomute.id] = ms(mutetime);
         return;
     });
@@ -666,13 +437,14 @@ function checkForMatWords(message) {
 }
 
 function UnMute(channel, id) {
-    let role = client.guilds.get(channel).roles.find(`name`, 'Mute (Нарушители)').id; //название роли
+	if(!IsAuth) return false;
+    let role = client.guilds.get(channel).roles.find('name', muterole).id; //название роли
     try {
         client.guilds.get(channel).members.get(id).removeRole(role);
     } catch(err) {
         return false;
     }
-    client.guilds.get(channel).channels.find('name', 'general').send('Пользователь убран из мута(<@'+id+'>)!');//название чат-канала куда будут писаться оповещения
+    client.guilds.get(channel).channels.find('id', serverid).send(`Пользователь убран из мута(<@${id}>)!`);//название чат-канала куда будут писаться оповещения
     return true;
 }
 
@@ -680,22 +452,12 @@ function minusMutedList() {
     for (var key in mutedlist) {
         if(mutedlist[key] <= 1) { 
             mutedlist[key] = mutedlist[key] - 1;
-            if(UnMute('348866080019709952', key)) delete mutedlist[key];//ID сервера
+            if(UnMute(serverid, key)) delete mutedlist[key];//ID сервера
         } else {
             mutedlist[key] = mutedlist[key] - 1;
         }
     }
 }
-
-function discoRole() {
-    let random = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
-    roles.forEach((role) => {
-      let theRole = message.guild.roles.find("name", "Mute (Нарушители)");
-      theRole.edit({color: random}).catch(e => {
-        console.error(e);
-      });
-    });
-  }
 
 setInterval(minusMutedList, 1);
 
