@@ -3,7 +3,7 @@ const fs = require('fs');
 const ms = require('ms');
 const client = new Discord.Client();
 const permissions = require('./permissions.js');
-const { prefix, token, serverid, rainbowroles, muterole} = require('./config.json');
+const { prefix, token, serverid, rainbowroles, muterole, reportchannel} = require('./config.json');
 var mutedlist = JSON.parse(fs.readFileSync('muted.json'));
 var badwordslist = JSON.parse(fs.readFileSync('words.json'));
 var IsAuth = false;
@@ -328,7 +328,7 @@ client.on('message', message => {
             .addField("Канал", `${message.channel}`)
             .addField("Отправитель", `<@${message.author.id}>`)
             .addField("Текст репорта", `**${reportuser[1]}**\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
-            message.guild.channels.find('name', 'desire-menu-music').send(embed);
+            message.guild.channels.find('name', reportchannel).send(embed);
             message.reply("ваша жалоба на пользователя отправлена! Ваше сообщение с командой !report было удалено.");
             message.delete(message.author.id);
         return;
