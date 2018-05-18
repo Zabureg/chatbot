@@ -198,7 +198,7 @@ client.on('message', message => {
 				.setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
 				.addField("[!unmute]", `${member} вышел из мута!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
 			message.channel.send(embed);
-			let role = client.guilds.get(serverid).roles.find('name', muterole).id;
+			let role = client.guilds.get(serverid).roles.find('name', muterol).id;
 			member.removeRole(role);
 			delete mutedlist[member.id];
         }
