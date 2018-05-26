@@ -1,7 +1,7 @@
 # chatbot
 chatbot discord by cheesega - новый бот для чата в программе discord на языке nodejs, который будет вам отличным помощником на вашем сервере. Для его установки, перейдите в Wiki, там все команды есть. На случай, если у вас что-то не получится или будет интересно пообщаться с обладателями бота и его создателями, заходите на наш сервер discord https://discord.gg/jwnPHdA
 <hr>
-# Install
+ <h1>Install</h1><br>
 Для установки бота, используйте команды (Linux Ubuntu 16)<br>
 apt-get install sudo zip unzip nano curl<br>
 curl --silent --location https://deb.nodesource.com/setup_8.x| bash -<br>
@@ -15,7 +15,7 @@ npm install ms<br>
 npm i quick.hook<br>
 npm install pm2 pm2 start index.js<br>
 <hr>
-# Commands
+ <h1>Commands</h1>
 !clear - отчистка сервера от сообщений бота и сообщений с командами<br>
 !mute - добавляет человека в мут<br>
 !addmat - добавляет матное слово в черный список<br>
