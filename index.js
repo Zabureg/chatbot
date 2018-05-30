@@ -3,9 +3,10 @@ const fs = require('fs');
 const ms = require('ms');
 const client = new Discord.Client();
 const permissions = require('./permissions.js');
-const { prefix, token, serverid, rainbowroles, muterol, reportchannel, generalchatid, defaultrole, defaultroleonoff, welcome} = require('./config.json');
+const { prefix, token, serverid, rainbowroles, muterol, reportchannel, generalchatid, defaultrole, defaultroleonoff, welcome, warningcount} = require('./config.json');
 const send = require('quick.hook');
 var mutedlist = JSON.parse(fs.readFileSync('muted.json'));
+var infobanlist = JSON.parse(fs.readFileSync('infoban.json'));
 var badwordslist = JSON.parse(fs.readFileSync('words.json'));
 var coins = JSON.parse(fs.readFileSync('coins.json'));
 var IsAuth = false;
@@ -622,12 +623,15 @@ function Mute(message, args, auto) {
 			.addField("User", `<@${tomute.id}>`, true)
 			.addField("Moderator", `<@${mod}>`, true)
 			.addField("Reason", `${reason}`, true)
-			.addField("Duration", `${mutetime}`, true)
+            .addField("Duration", `${mutetime}`, true)
             send(message.channel, embed, {
                 name: 'Warning!',
                 icon: 'https://i.imgur.com/dMp8E6P.jpg'
             })
         if(ms(mutetime) != 0) mutedlist[tomute.id] = ms(mutetime);
+        if(!infobanlist[tomute.id]) infobanlist[tomute.id] = 0;
+        //infobanlist[tomute.id].push(1);
+        infobanlist[tomute.id] += 1;
         return;
     });
 }
@@ -666,12 +670,28 @@ function checkForMatWords(message) {
 function UnMute(channel, id) {
 	if(!IsAuth) return false;
     let role = client.guilds.get(channel).roles.find('name', muterol).id;
+    member = client.guilds.get(channel).members.get(id);
     try {
         client.guilds.get(channel).members.get(id).removeRole(role);
     } catch(err) {
         return false;
     }
-    send(client.guilds.get(channel).channels.find('id', generalchatid), `Пользователь убран из мута(<@${id}>)!`,{
+    if(infobanlist[member.id] == warningcount){
+        member.ban();
+        color = 16734464;
+		title = "[!ban]";
+		text = `${member} забанен на сервере!\nЕго ID: ${member.id}`;
+		send(client.guilds.get(channel).channels.find('id', generalchatid), infomessage(color, title, text), {
+            name:'Warning!',
+            icon:'https://i.imgur.com/dMp8E6P.jpg'
+        });
+        delete infobanlist[member.id];
+        return true;
+    }
+    color = 16734464;
+    title = "[!ban]";
+    text = `Пользователь убран из мута(<@${id}>)!\nУ него ${infobanlist[id]} предупреждений(я)! Бан даётся при ${warningcount} предупреждениях!`;
+    send(client.guilds.get(channel).channels.find('id', generalchatid), infomessage(color, title, text),{
         name: 'Warning!',
         icon: 'https://i.imgur.com/dMp8E6P.jpg'
     });
@@ -700,3 +720,8 @@ function saveBadWordsList() {
 	fs.writeFile('words.json', JSON.stringify(badwordslist), function() {/*console.log(badwordslist);*/});
 }
 setInterval(saveBadWordsList, 1000);
+
+function saveinfobanlist() {
+    fs.writeFile('infoban.json', JSON.stringify(infobanlist), function() {/*console.log(badwordslist);*/});
+}
+setInterval(saveinfobanlist, 1000);
