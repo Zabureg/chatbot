@@ -12,8 +12,10 @@ cd chatbot<br>
 npm install discord.js<br>
 npm install fs<br>
 npm install ms<br>
-npm i quick.hook<br>
-npm install pm2 pm2 start index.js<br>
+npm install mysql<br>
+npm install weather-js<br>
+npm install pm2<br>
+pm2 start index.js<br>
 <hr>
  <h1>Commands</h1>
 !clear - отчистка сервера от сообщений бота и сообщений с командами<br>
