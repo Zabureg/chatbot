@@ -1,13 +1,18 @@
 {
     "prefix": "!",
     "token": "",
-    "serverid": "444807879258669056",
-    "rainbowroles": ["Coder", "Admin"],
-    "muterol": "Mute",
-    "reportchannel": "reports",
-    "generalchatid": "444807879849934850",
+    "serverid": "348866080019709952",
+    "rainbowroles": ["Администратор", "Модераторы", "Infinity Desire Menu Hack [v3.1]"],
+    "muterol": "Mute (Нарушители)",
+    "reportchannel": "desire-menu-music",
+    "generalchatid": "348866080019709953",
     "defaultrole": "",
     "defaultroleonoff": "off",
-    "welcome": "привет! Напиши мне !инфо и увидишь мои команды, за остальным пиши админам!",
-    "warningcount": "5"
+    "welcome": "привет! Напиши мне !info и увидишь мои команды, а так же прочитайте **#faq** и **#regulations**",
+    "warningcount": "5",
+    "bd_h": "0.0.0.0",
+    "bd_u": "root",
+    "bd_p": "root",
+    "bd_d": "bot",
+    "table": "perms"
 }
