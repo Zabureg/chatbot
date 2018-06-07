@@ -827,14 +827,16 @@ function UnMute(channel, id) {
         color = 16734464;
         title = `[${prefix}unmute]`;
         text = `${member} забанен на сервере!\nЕго ID: ${member.id}`;
-        send(client.guilds.get(channel).channels.find('id', generalchatid), infomessage(color, title, text));
+        var channel = client.guilds.get(channel).channels.find('id', generalchatid);
+    	channel.send(infomessage(color, title, text));
         delete infobanlist[member.id];
         return true;
     }
     color = 16734464;
     title = `[${prefix}unmute]`;
     text = `Пользователь убран из мута(<@${id}>)!\nУ него ${infobanlist[id]} предупреждений(я)! Бан даётся при ${warningcount} предупреждениях!`;
-    send(client.guilds.get(channel).channels.find('id', generalchatid), infomessage(color, title, text));
+    var channel = client.guilds.get(channel).channels.find('id', generalchatid);
+    channel.send(infomessage(color, title, text));
     return true;
 }
 
