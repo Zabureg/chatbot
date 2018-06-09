@@ -1,12 +1,12 @@
 {
-  "name": "chatbotbycheese",
-  "version": "1.8",
+  "name": "cheesega_bot",
+  "version": "2.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "cheese",
+  "author": "cheesega",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.3.2",
