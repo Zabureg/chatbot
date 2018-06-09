@@ -792,7 +792,7 @@ async function purge(message, args) {
 function infomessage(color, title, text) {
         const embed = new Discord.RichEmbed()
             .setColor(color)
-            .setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+            .setFooter("Coder - cheesega. Version: 2.1.1(fixed)", "https://cdn.discordapp.com/avatars/247102468331274240/7a177f5cf82a96b762573febf6c77c46.png")
             .addField(title, `${text}\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
         
         return embed;
