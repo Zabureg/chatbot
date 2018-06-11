@@ -96,7 +96,7 @@ client.on('message', message => {
         if(!args.length) {
             color = 16777215;
             title = `[${prefix}info]`;
-            text = `список моих команд(чтобы узнать информацию о команде, пиши, например, **${prefix}info 1**):\n**1. ${prefix}radmin**\n**2. ${prefix}mute**\n**3. ${prefix}addmat**\n**4. ${prefix}unmute**\n**5. ${prefix}muted**\n**6. ${prefix}github**\n**7. ${prefix}kick**\n**8. ${prefix}ban**\n**9. ${prefix}unban**\n**10. ${prefix}rainbow**\n**11. ${prefix}coin**\n**12. ${prefix}exit**\n**13. ${prefix}report**\n**14. ${prefix}warnings**\n**15. ${prefix}rwarnings**\n**16. ${prefix}admin**\n**17. ${prefix}weather**\n**18. ${prefix}clear**\n**19. ${prefix}clean**`;
+            text = `список моих команд(чтобы узнать информацию о команде, пиши, например, **${prefix}info 1**):\n**1. ${prefix}radmin**\n**2. ${prefix}mute**\n**3. ${prefix}addmat**\n**4. ${prefix}unmute**\n**5. ${prefix}muted**\n**6. ${prefix}github**\n**7. ${prefix}kick**\n**8. ${prefix}ban**\n**9. ${prefix}unban**\n**10. ${prefix}rainbow**\n**11. ${prefix}coin**\n**12. ${prefix}exit**\n**13. ${prefix}report**\n**14. ${prefix}warnings**\n**15. ${prefix}rwarnings**\n**16. ${prefix}admin**\n**17. ${prefix}weather**\n**18. ${prefix}clear**\n**19. ${prefix}clean**\n**20. ${prefix}admins**`;
             message.channel.send(infomessage(color, title, text));
             console.log(`${message.author.username}(${message.author.id}) send command info for bot!`);
             return;
@@ -254,6 +254,14 @@ client.on('message', message => {
             color = 16777215;
             title = `[${prefix}info 19]`;
             text = `${prefix}clean число - бот удаляет все сообщения`;
+            console.log(`${message.author.username}(${message.author.id}) send command info for bot!`);
+            message.channel.send(infomessage(color, title, text));
+            return;
+        }
+        if(args[0] == "20"){
+            color = 16777215;
+            title = `[${prefix}info 20]`;
+            text = `${prefix}admins - показывает пользователей, которые являются админами для бота.`;
             console.log(`${message.author.username}(${message.author.id}) send command info for bot!`);
             message.channel.send(infomessage(color, title, text));
             return;
@@ -436,6 +444,7 @@ client.on('message', message => {
             }
             var zapros = `DELETE FROM bot.${table} WHERE user = ${member.id};`;
             mysqlzapros(zapros);
+            checkbd();
             color = 16734464;
             title = `[${prefix}radmin]`;
             text = `Пользователь ${member} удалён из админов!`;
@@ -726,6 +735,26 @@ client.on('message', message => {
         });
         return;
     }
+
+    if(commandName == "admins"){
+    	console.log(`${message.author.username}(${message.author.id}) send command ${commandName} for bot!`);
+    	color = 16777215;
+    	title = `[${prefix}admins]`;
+        text =  `**Список пользователей, которые добавлены в администраторы бота:**\n`;
+		perms['root'].forEach(function(item, i, arr) {
+  			text += (`\n<@${item}>`);
+		});
+		message.channel.send(infomessage(color, title, text));
+    	return;
+	}
+	if(commandName == "test"){
+		badwordslist.forEach(function(item, i, arr){
+			console.log(item);
+			if(args[0] == item){
+				message.channel.send("ff");
+			}
+		});
+	}
     /*
     if(commandName == "coins"){
         let member = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
@@ -807,7 +836,7 @@ function Mute(message, args, auto) {
     if(!tomute){
         const embed = new Discord.RichEmbed()
             .setColor(16734464)
-            .setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+            .setFooter("Coder - cheesega. Version: 2.1.1(fixed)", "https://cdn.discordapp.com/avatars/247102468331274240/7a177f5cf82a96b762573febf6c77c46.png")
             .addField(`[${prefix}mute]`, `Используйте ${prefix}mute @user 1s/m/h/d!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
         message.channel.send(embed);
         return
@@ -816,7 +845,7 @@ function Mute(message, args, auto) {
     if(!mutetime){
         const embed = new Discord.RichEmbed()
             .setColor(16734464)
-            .setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")          
+            .setFooter("Coder - cheesega. Version: 2.1.1(fixed)", "https://cdn.discordapp.com/avatars/247102468331274240/7a177f5cf82a96b762573febf6c77c46.png")        
             .addField("[!mute]", `Вы не указали время!\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
             message.channel.send(embed);
         return
@@ -838,7 +867,7 @@ function Mute(message, args, auto) {
         let user = client.guilds.get(serverid).members.get(tomute.id).user;
         const embed = new Discord.RichEmbed()
             .setColor(13632027)
-            .setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
+            .setFooter("Coder - cheesega. Version: 2.1.1(fixed)", "https://cdn.discordapp.com/avatars/247102468331274240/7a177f5cf82a96b762573febf6c77c46.png")
             .addField("User", `<@${tomute.id}>`, true)
             .addField("Moderator", `<@${mod}>`, true)
             .addField("Reason", `${reason}`, true)
@@ -950,9 +979,10 @@ function checkbd(){
     var zapros = `SELECT * FROM ${table} WHERE role = "root"`;
             connection.query(zapros, function(err, rows, fields) {
             console.log('Checking database...');
+            perms['root'] = [];
             rows.forEach(function(element, index, array) {
                 if(!perms[element.role]) perms[element.role] = [];
-                perms[element.role].push(element.user);
+                    perms[element.role].push(element.user);
                 })
             })
     connection.end();
