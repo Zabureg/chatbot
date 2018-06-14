@@ -13,7 +13,7 @@ var IsAuth = false;
 /* RAINBOW START */
 var interval;
 let place = 0;
-const size    = 85;
+const size    = 40;
 const rainbow = new Array(size);
 
 for (var i=0; i<size; i++) {
@@ -88,6 +88,15 @@ client.on('guildMemberAdd', member => {
 })
 
 client.on('message', message => {
+	let muterole = client.guilds.get(serverid).roles.find('name', muterol);
+    if(!muterole){
+    		console.log('Mute role undefined! Create this role "Mute"');
+    		message.guild.createRole({
+    		name: muterol,
+    		color: '720000',
+    		permission:[]
+        })
+    }
     if(message.author === client.user) return;
     if (!message.content.startsWith(prefix)) return checkForMatWords(message);
     const args = message.content.slice(prefix.length).split(/ +/);
@@ -96,7 +105,7 @@ client.on('message', message => {
         if(!args.length) {
             color = 16777215;
             title = `[${prefix}info]`;
-            text = `список моих команд(чтобы узнать информацию о команде, пиши, например, **${prefix}info 1**):\n**1. ${prefix}radmin**\n**2. ${prefix}mute**\n**3. ${prefix}addmat**\n**4. ${prefix}unmute**\n**5. ${prefix}muted**\n**6. ${prefix}github**\n**7. ${prefix}kick**\n**8. ${prefix}ban**\n**9. ${prefix}unban**\n**10. ${prefix}rainbow**\n**11. ${prefix}coin**\n**12. ${prefix}exit**\n**13. ${prefix}report**\n**14. ${prefix}warnings**\n**15. ${prefix}rwarnings**\n**16. ${prefix}admin**\n**17. ${prefix}weather**\n**18. ${prefix}clear**\n**19. ${prefix}clean**\n**20. ${prefix}admins**`;
+            text = `список моих команд(чтобы узнать информацию о команде, пиши, например, **${prefix}info 1**):\n**1. ${prefix}radmin**\n**2. ${prefix}mute**\n**3. ${prefix}addmat**\n**4. ${prefix}unmute**\n**5. ${prefix}muted**\n**6. ${prefix}github**\n**7. ${prefix}kick**\n**8. ${prefix}ban**\n**9. ${prefix}unban**\n**10. ${prefix}rainbow**\n**11. ${prefix}coin**\n**12. ${prefix}exit**\n**13. ${prefix}report**\n**14. ${prefix}warnings**\n**15. ${prefix}rwarnings**\n**16. ${prefix}admin**\n**17. ${prefix}weather**\n**18. ${prefix}clear**\n**19. ${prefix}clean**\n**20. ${prefix}admins**\n**21. ${prefix}restart**`;
             message.channel.send(infomessage(color, title, text));
             console.log(`${message.author.username}(${message.author.id}) send command info for bot!`);
             return;
@@ -262,6 +271,14 @@ client.on('message', message => {
             color = 16777215;
             title = `[${prefix}info 20]`;
             text = `${prefix}admins - показывает пользователей, которые являются админами для бота.`;
+            console.log(`${message.author.username}(${message.author.id}) send command info for bot!`);
+            message.channel.send(infomessage(color, title, text));
+            return;
+        }
+        if(args[0] == "21"){
+            color = 16777215;
+            title = `[${prefix}info 21]`;
+            text = `${prefix}restart - перезапускает бота.`;
             console.log(`${message.author.username}(${message.author.id}) send command info for bot!`);
             message.channel.send(infomessage(color, title, text));
             return;
@@ -444,11 +461,11 @@ client.on('message', message => {
             }
             var zapros = `DELETE FROM bot.${table} WHERE user = ${member.id};`;
             mysqlzapros(zapros);
-            checkbd();
             color = 16734464;
             title = `[${prefix}radmin]`;
             text = `Пользователь ${member} удалён из админов!`;
             message.channel.send(infomessage(color, title, text));
+            checkbd();
         return;
     }
 
@@ -471,8 +488,20 @@ client.on('message', message => {
             message.channel.send(infomessage(color, title, text));
             return;
         }
-        if(matches[1]) badwordslist.push("^"+matches[1]+"$"); return message.channel.send(`Добавлено новое слово в черный список --> ${matches[1]}`);
-        return;
+        if(badwordslist.indexOf("^"+matches[1]+"$") == -1){
+        	badwordslist.push("^"+matches[1]+"$");
+        	color = 16711680;
+            title = `[${prefix}addmat]`;
+            text = `Слово было добавлено в список запрещённых слов!`;
+            message.channel.send(infomessage(color, title, text));
+        	return;
+        }else{
+        	color = 16711680;
+            title = `[${prefix}addmat]`;
+            text = `Это слово уже есть в списке запрещённых слов!`;
+            message.channel.send(infomessage(color, title, text));
+        	return;
+        }
     }
     if(commandName == "unmute"){
         console.log(`${message.author.username}(${message.author.id}) send command ${commandName} for bot!`);
@@ -625,7 +654,7 @@ client.on('message', message => {
             return;
         }
         if(args[0] == "start") {
-            if(interval == undefined) interval = setInterval(() => { discoRole(message); }, 250);
+            if(interval == undefined) interval = setInterval(() => { discoRole(message); }, 150);
             color = 16711867;
             title = `[${prefix}rainbow start]`;
             text = `Радуга началась!`;
@@ -747,13 +776,26 @@ client.on('message', message => {
 		message.channel.send(infomessage(color, title, text));
     	return;
 	}
-	if(commandName == "test"){
-		badwordslist.forEach(function(item, i, arr){
-			console.log(item);
-			if(args[0] == item){
-				message.channel.send("ff");
-			}
-		});
+	if(commandName == "restart"){
+		console.log(`${message.author.username}(${message.author.id}) send command ${commandName} for bot!`);
+		if(perms['root'].indexOf(message.author.id) == -1){
+            color = 16711680;
+            title = `[${prefix}restart]`;
+            text = `У тебя нет прав для выполнения данной команды!`;
+            message.channel.send(infomessage(color, title, text));
+            console.log(`WARNING! ${message.author.username} does not have permission to execute this command!`);
+            return;
+        }
+        message.delete()
+            .then(message => client.destroy())
+            .then(() => client.login(token))
+            .then(() => checkbd())
+            .then(() => console.log("Restarting the bot..."));
+        color = 16711680;
+    	title = `[${prefix}restart]`;
+    	text = `**Внимание!** Перезагрузка бота!`;
+    	message.channel.send(infomessage(color, title, text));
+        return;
 	}
     /*
     if(commandName == "coins"){
@@ -821,7 +863,7 @@ async function purge(message, args) {
 function infomessage(color, title, text) {
         const embed = new Discord.RichEmbed()
             .setColor(color)
-            .setFooter("Coder - cheesega. Version: 2.1.1(fixed)", "https://cdn.discordapp.com/avatars/247102468331274240/7a177f5cf82a96b762573febf6c77c46.png")
+            .setFooter("Coder - cheesega. Version: 2.3", "https://cdn.discordapp.com/avatars/247102468331274240/7a177f5cf82a96b762573febf6c77c46.png")
             .addField(title, `${text}\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
         
         return embed;
@@ -979,10 +1021,10 @@ function checkbd(){
     var zapros = `SELECT * FROM ${table} WHERE role = "root"`;
             connection.query(zapros, function(err, rows, fields) {
             console.log('Checking database...');
-            perms['root'] = [];
+            perms = [];
             rows.forEach(function(element, index, array) {
                 if(!perms[element.role]) perms[element.role] = [];
-                    perms[element.role].push(element.user);
+                perms[element.role].push(element.user);
                 })
             })
     connection.end();
