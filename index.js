@@ -717,6 +717,7 @@ client.on('message', message => {
             message.channel.send(infomessage(color, title, text));
             return
         }
+        channel = message.guild.channels.find('name', reportchannel);
         const embed = new Discord.RichEmbed()
             .setColor(13632027)
             .setFooter("Coder - cheesega.", "https://cdn.discordapp.com/avatars/247102468331274240/7e640d45adaab729b27edb5d26437cfd.png")
@@ -724,7 +725,7 @@ client.on('message', message => {
             .addField("Канал", `${message.channel}`)
             .addField("Отправитель", `<@${message.author.id}>`)
             .addField("Текст репорта", `**${reportuser[1]}**\n\n[Сервер поддержки](https://discord.gg/jwnPHdA)`)
-            message.channel.send(infomessage(color, title, text));
+            channel.send(embed);
             message.reply("ваша жалоба на пользователя отправлена! Ваше сообщение с командой !report было удалено.");
             message.delete(message.author.id);
         return;
